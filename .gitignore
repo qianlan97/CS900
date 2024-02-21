@@ -1,0 +1,10 @@
+user_input.npy
+alexnet-pretrained.pt
+resnet18-pretrained.pt
+resnet18-posttrained.pt
+gradients.pt
+gradients_inside.pt
+gradients_outside.pt
+shared_mmap.dat
+status.dat
+dataset/

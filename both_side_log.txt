@@ -1,0 +1,180 @@
+client side:
+#############################################################
+conv2d sent to server: --- 0.000000 ---
+conv2d received from server: --- 3.999493 ---
+batch norm layer: --- 5.699125 ---
+relu layer: --- 6.181996 ---
+conv2d sent to server: --- 7.296302 ---
+conv2d received from server: --- 11.800652 ---
+batch norm layer: --- 12.552236 ---
+relu layer: --- 13.215773 ---
+max pool layer: --- 13.730880 ---
+conv2d sent to server: --- 13.903873 ---
+conv2d received from server: --- 14.401753 ---
+batch norm layer: --- 14.663277 ---
+relu layer: --- 14.818948 ---
+conv2d sent to server: --- 15.062827 ---
+conv2d received from server: --- 15.471993 ---
+batch norm layer: --- 15.656301 ---
+relu layer: --- 15.774039 ---
+max pool layer: --- 15.819908 ---
+conv2d sent to server: --- 15.873424 ---
+conv2d received from server: --- 16.098283 ---
+batch norm layer: --- 16.281058 ---
+relu layer: --- 16.375475 ---
+conv2d sent to server: --- 16.528931 ---
+conv2d received from server: --- 16.798577 ---
+batch norm layer: --- 16.972252 ---
+relu layer: --- 17.137169 ---
+conv2d sent to server: --- 17.225646 ---
+conv2d received from server: --- 17.474445 ---
+batch norm layer: --- 17.640302 ---
+relu layer: --- 17.689119 ---
+conv2d sent to server: --- 17.785729 ---
+conv2d received from server: --- 18.078471 ---
+batch norm layer: --- 18.260423 ---
+relu layer: --- 18.299484 ---
+max pool layer: --- 18.407575 ---
+conv2d sent to server: --- 18.467473 ---
+conv2d received from server: --- 18.562770 ---
+batch norm layer: --- 18.684172 ---
+relu layer: --- 18.723641 ---
+conv2d sent to server: --- 18.758165 ---
+conv2d received from server: --- 18.860774 ---
+batch norm layer: --- 18.946060 ---
+relu layer: --- 18.964452 ---
+conv2d sent to server: --- 18.999364 ---
+conv2d received from server: --- 19.079974 ---
+batch norm layer: --- 19.267114 ---
+relu layer: --- 19.299437 ---
+conv2d sent to server: --- 19.342946 ---
+conv2d received from server: --- 19.407328 ---
+batch norm layer: --- 19.503978 ---
+relu layer: --- 19.563259 ---
+max pool layer: --- 19.584465 ---
+conv2d sent to server: --- 19.592897 ---
+conv2d received from server: --- 19.628842 ---
+batch norm layer: --- 19.738405 ---
+relu layer: --- 19.759441 ---
+conv2d sent to server: --- 19.784461 ---
+conv2d received from server: --- 19.814550 ---
+batch norm layer: --- 19.919455 ---
+relu layer: --- 19.947207 ---
+conv2d sent to server: --- 19.967468 ---
+conv2d received from server: --- 19.982654 ---
+batch norm layer: --- 20.067457 ---
+relu layer: --- 20.099698 ---
+conv2d sent to server: --- 20.120810 ---
+conv2d received from server: --- 20.136496 ---
+batch norm layer: --- 20.299448 ---
+relu layer: --- 20.326993 ---
+max pool layer: --- 20.347605 ---
+linear sent to server: --- 20.367466 ---
+linear received from server: --- 21.038016 ---
+relu layer: --- 21.038173 ---
+linear sent to server: --- 21.060643 ---
+linear received from server: --- 21.189977 ---
+relu layer: --- 21.190198 ---
+linear sent to server: --- 21.201341 ---
+linear received from server: --- 21.212520 ---
+backward: --- 21.795248 ---
+batch # 1 finished
+All finished: --- 21.836300 ---
+#############################################################
+server side:
+#############################################################
+op_type is: 1
+conv received: --- 0.000841 ---
+sent: --- 0.065952 ---
+count: 95
+Server is listening...
+op_type is: 1
+conv received: --- 7.364797 ---
+sent: --- 7.439720 ---
+count: 96
+Server is listening...
+op_type is: 1
+conv received: --- 13.919995 ---
+sent: --- 13.961788 ---
+count: 97
+Server is listening...
+op_type is: 1
+conv received: --- 15.080943 ---
+sent: --- 15.117979 ---
+count: 98
+Server is listening...
+op_type is: 1
+conv received: --- 15.876699 ---
+sent: --- 15.899182 ---
+count: 99
+Server is listening...
+op_type is: 1
+conv received: --- 16.540150 ---
+sent: --- 16.568832 ---
+count: 100
+Server is listening...
+op_type is: 1
+conv received: --- 17.239399 ---
+sent: --- 17.267585 ---
+count: 101
+Server is listening...
+op_type is: 1
+conv received: --- 17.790886 ---
+sent: --- 17.820317 ---
+count: 102
+Server is listening...
+op_type is: 1
+conv received: --- 18.465293 ---
+sent: --- 18.489673 ---
+count: 103
+Server is listening...
+op_type is: 1
+conv received: --- 18.764822 ---
+sent: --- 18.796002 ---
+count: 104
+Server is listening...
+op_type is: 1
+conv received: --- 19.002991 ---
+sent: --- 19.035833 ---
+count: 105
+Server is listening...
+op_type is: 1
+conv received: --- 19.350069 ---
+sent: --- 19.380628 ---
+count: 106
+Server is listening...
+op_type is: 1
+conv received: --- 19.593772 ---
+sent: --- 19.623565 ---
+count: 107
+Server is listening...
+op_type is: 1
+conv received: --- 19.781685 ---
+sent: --- 19.807821 ---
+count: 108
+Server is listening...
+op_type is: 1
+conv received: --- 19.951910 ---
+sent: --- 19.978079 ---
+count: 109
+Server is listening...
+op_type is: 1
+conv received: --- 20.104402 ---
+sent: --- 20.132234 ---
+count: 110
+Server is listening...
+op_type is: 2
+linear received: --- 20.353220 ---
+sent: --- 21.037328 ---
+count: 111
+Server is listening...
+op_type is: 2
+linear received: --- 21.060844 ---
+sent: --- 21.189213 ---
+count: 112
+Server is listening...
+op_type is: 2
+linear received: --- 21.200146 ---
+sent: --- 21.211656 ---
+count: 113
+Server is listening...

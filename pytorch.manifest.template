@@ -1,0 +1,68 @@
+# SPDX-License-Identifier: LGPL-3.0-or-later
+
+# PyTorch manifest template
+
+loader.entrypoint = "file:{{ gramine.libos }}"
+libos.entrypoint = "{{ entrypoint }}"
+
+loader.log_level = "{{ log_level }}"
+
+loader.env.LD_LIBRARY_PATH = "/lib:{{ arch_libdir }}:/usr/{{ arch_libdir }}"
+loader.env.HOME = "{{ env.HOME }}"
+
+# Restrict the maximum number of threads to prevent insufficient memory
+# issue, observed on CentOS/RHEL.
+loader.env.OMP_NUM_THREADS = "8"
+
+loader.insecure__use_cmdline_argv = true
+
+sys.stack.size = "2M"
+
+fs.mounts = [
+  { path = "{{ entrypoint }}", uri = "file:{{ entrypoint }}" },
+  { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
+  { path = "{{ arch_libdir }}", uri = "file:{{ arch_libdir }}" },
+  { path = "/usr/{{ arch_libdir }}", uri = "file:/usr/{{ arch_libdir }}" },
+{% for path in python.get_sys_path(entrypoint) %}
+  { path = "{{ path }}", uri = "file:{{ path }}" },
+{% endfor %}
+
+  { type = "tmpfs", path = "/tmp" },
+#  { type = "untrusted_shm", path = "/dev/shm", uri = "dev:/dev/shm" },
+]
+
+sgx.enclave_size = "8G"
+sgx.max_threads = 32
+sgx.edmm_enable = {{ 'true' if env.get('EDMM', '0') == '1' else 'false' }}
+
+sgx.trusted_files = [
+  "file:{{ entrypoint }}",
+  "file:{{ gramine.libos }}",
+  "file:{{ gramine.runtimedir() }}/",
+  "file:{{ arch_libdir }}/",
+  "file:/usr/{{ arch_libdir }}/",
+{% for path in python.get_sys_path(entrypoint) %}
+  "file:{{ path }}{{ '/' if path.is_dir() else '' }}",
+{% endfor %}
+
+#  "file:client_resnet18.py",
+  "file:client_vgg19.py",
+#  "file:client_alexnet.py",
+#  "file:tee_resnet18.py",
+  "file:tee_vgg19.py",
+#  "file:tee_alexnet.py",
+#  "file:encryp_time.py",
+#  "file:test1.py",
+#  "file:test2.py",
+#  "file:benchmark.py",
+
+#  "file:single-image/cifar10_test_image.png",
+  "file:dataset/",
+]
+
+sgx.allowed_files = [
+  "file:shared_mmap_1.dat",
+  "file:shared_mmap_2.dat",
+  "file:status.dat",
+#  "file:gradients.pt",
+]

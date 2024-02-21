@@ -1,0 +1,91 @@
+[loader]
+entrypoint = "file:/usr/lib/x86_64-linux-gnu/gramine/libsysdb.so"
+log_level = "error"
+insecure__use_cmdline_argv = true
+
+[loader.env]
+LD_LIBRARY_PATH = "/lib:/lib/x86_64-linux-gnu:/usr//lib/x86_64-linux-gnu"
+HOME = "/home/iar"
+OMP_NUM_THREADS = "8"
+
+[libos]
+entrypoint = "/home/iar/anaconda3/bin/python3.7"
+
+[sys.stack]
+size = "2M"
+
+[[fs.mounts]]
+path = "/home/iar/anaconda3/bin/python3.7"
+uri = "file:/home/iar/anaconda3/bin/python3.7"
+
+[[fs.mounts]]
+path = "/lib"
+uri = "file:/usr/lib/x86_64-linux-gnu/gramine/runtime/glibc"
+
+[[fs.mounts]]
+path = "/lib/x86_64-linux-gnu"
+uri = "file:/lib/x86_64-linux-gnu"
+
+[[fs.mounts]]
+path = "/usr//lib/x86_64-linux-gnu"
+uri = "file:/usr//lib/x86_64-linux-gnu"
+
+[[fs.mounts]]
+path = "/home/iar/anaconda3/lib/python3.7"
+uri = "file:/home/iar/anaconda3/lib/python3.7"
+
+[[fs.mounts]]
+path = "/home/iar/anaconda3/lib/python3.7/lib-dynload"
+uri = "file:/home/iar/anaconda3/lib/python3.7/lib-dynload"
+
+[[fs.mounts]]
+path = "/home/iar/.local/lib/python3.7/site-packages"
+uri = "file:/home/iar/.local/lib/python3.7/site-packages"
+
+[[fs.mounts]]
+path = "/home/iar/anaconda3/lib/python3.7/site-packages"
+uri = "file:/home/iar/anaconda3/lib/python3.7/site-packages"
+
+[[fs.mounts]]
+path = "/home/iar/anaconda3/lib/python3.7/site-packages/locket-0.2.1-py3.7.egg"
+uri = "file:/home/iar/anaconda3/lib/python3.7/site-packages/locket-0.2.1-py3.7.egg"
+
+[[fs.mounts]]
+type = "tmpfs"
+path = "/tmp"
+
+[sgx]
+enclave_size = "8G"
+max_threads = 32
+edmm_enable = false
+trusted_files = [
+    { uri = "file:/home/iar/anaconda3/bin/python3.7" },
+    { uri = "file:/usr/lib/x86_64-linux-gnu/gramine/libsysdb.so" },
+    { uri = "file:/usr/lib/x86_64-linux-gnu/gramine/runtime/glibc/" },
+    { uri = "file:/lib/x86_64-linux-gnu/" },
+    { uri = "file:/usr//lib/x86_64-linux-gnu/" },
+    { uri = "file:/home/iar/anaconda3/lib/python3.7/" },
+    { uri = "file:/home/iar/anaconda3/lib/python3.7/lib-dynload/" },
+    { uri = "file:/home/iar/.local/lib/python3.7/site-packages/" },
+    { uri = "file:/home/iar/anaconda3/lib/python3.7/site-packages/" },
+    { uri = "file:/home/iar/anaconda3/lib/python3.7/site-packages/locket-0.2.1-py3.7.egg" },
+    { uri = "file:client_vgg19.py" },
+    { uri = "file:tee_vgg19.py" },
+    { uri = "file:dataset/" },
+]
+allowed_files = [
+    "file:shared_mmap_1.dat",
+    "file:shared_mmap_2.dat",
+    "file:status.dat",
+]
+isvprodid = 0
+isvsvn = 0
+remote_attestation = "none"
+debug = false
+require_avx = false
+require_avx512 = false
+require_mpx = false
+require_pkru = false
+require_amx = false
+require_exinfo = false
+enable_stats = false
