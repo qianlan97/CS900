@@ -124,31 +124,31 @@ trans = transforms.Compose([
 
 train_set=torchvision.datasets.CIFAR10(root="./dataset",train=True,download=True,transform=trans)
 test_set=torchvision.datasets.CIFAR10(root="./dataset",train=False,download=True,transform=trans)
-train_dataset=data.DataLoader(train_set,batch_size=64,shuffle=True)
-test_dataset=data.DataLoader(test_set,batch_size=64)
+train_dataset=data.DataLoader(train_set,batch_size=128,shuffle=True)
+test_dataset=data.DataLoader(test_set,batch_size=128)
 
 model = ResNet18()
 total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-print(f"Total trainable parameters: {total_params}")
+# print(f"Total trainable parameters: {total_params}")
 
 if torch.cuda.device_count() > 1:
     model = DataParallel(model)
 model.to(device)
-model.fuse_model()
+model.module.fuse_model()
 model.qconfig = torch.quantization.get_default_qconfig('fbgemm')
 model = torch.quantization.prepare(model, inplace=False)
 # summary(model, input_size=(3,32,32))
 
 optimizer1=torch.optim.SGD(model.parameters(),lr=0.01)          ## SGD more likely to get optimal. Adam converge faster
 loss=nn.CrossEntropyLoss().to(device)
-
+num_epoch = 1
 start_time = time.time()
-for epoch in range(5):
+for epoch in range(num_epoch):
     losssum=0.0
     total=0
     correct_top1 = 0
     correct_top3 = 0
-    progress_bar = tqdm(enumerate(train_dataset), total=len(train_dataset), desc=f'Epoch {epoch+1}/{5}', leave=False)
+    progress_bar = tqdm(enumerate(train_dataset), total=len(train_dataset), desc=f'Epoch {epoch+1}/{num_epoch}', leave=False)
     accuracy=0.0
     for i,(images,labels) in progress_bar:
         imgs=images.to(device)
@@ -169,9 +169,11 @@ for epoch in range(5):
 
         top1_accuracy = 100 * correct_top1 / total
         top3_accuracy = 100 * correct_top3 / total
-        progress_bar.set_postfix(loss=losssum/(i+1), top1_acc=top1_accuracy, top3_acc=top3_accuracy)
+        # progress_bar.set_postfix(loss=losssum/(i+1), top1_acc=top1_accuracy, top3_acc=top3_accuracy)
+        progress_bar.set_postfix(top1_acc=top1_accuracy, top3_acc=top3_accuracy)
     # print("Epoch: {}'s accuracy is {}".format(epoch, accuracy/len(train_set)))
-
+print("training: --- %s seconds ---" % (time.time() - start_time))
+start_time = time.time()
 # with torch.no_grad():
 #     accuracy=0.0
 #     for data in test_dataset:
@@ -207,4 +209,4 @@ with torch.no_grad():
     top3_accuracy = 100 * correct_top3 / total
     print(f'Test - Top-1 Accuracy: {top1_accuracy:.2f}%, Top-3 Accuracy: {top3_accuracy:.2f}%')
 
-print("--- %s seconds ---" % (time.time() - start_time))
+print("Testing: --- %s seconds ---" % (time.time() - start_time))
