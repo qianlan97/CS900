@@ -125,34 +125,28 @@ class VGG19(nn.Module):
             
              nn.Linear(4096,num_classes)
          )
-        # self.quant = torch.quantization.QuantStub()
-        # self.dequant = torch.quantization.DeQuantStub()
-    
-    # def fuse_model(self):
-    #     for module_name, module in self.features.named_children():
-    #         if 'Conv' in module_name:
-    #             torch.quantization.fuse_modules(module, ['0', '1', '2'], inplace=True)
+
 
     def forward(self, x):
-        x = self.features(x)
-        x = x.view(x.size(0),-1)
-        x = self.classifier(x)
-
-        # x = self.quant(x)
-        # x = self.features(x)
-        # x = x.view(x.size(0), -1)
-        # x = self.classifier(x)
-        # x = self.dequant(x)
-
-        return x
+        layer_times = []
+        
+        for layer in self.features:
+            start_time = time.time()
+            x = layer(x)
+            end_time = time.time()
+            layer_times.append(end_time - start_time)
+        
+        x = x.view(x.size(0), -1)
+        
+        for layer in self.classifier:
+            start_time = time.time()
+            x = layer(x)
+            end_time = time.time()
+            layer_times.append(end_time - start_time)
+        
+        return x, layer_times
 
 net = VGG19(3,10)
-# net.qconfig = torch.quantization.get_default_qconfig('fbgemm')
-# net.fuse_model()
-# net = torch.quantization.prepare(net, inplace=False)
-
-# if torch.cuda.device_count() > 1:
-#     net = DataParallel(net)
 net.to(device)
 # summary(net, input_size=(3, 224, 224))
 
@@ -171,68 +165,22 @@ for epoch in range(num_epochs):
     correct_top1 = 0
     correct_top3 = 0
     total = 0
-    # progress_bar = tqdm(enumerate(train_loader), total=len(train_loader), desc=f'Epoch {epoch+1}/{num_epochs}', leave=False)
-    
     batch_count = 0
-    for i, (images, labels) in enumerate(train_loader):
-    # for i, (images, labels) in progress_bar:
-        # if batch_count >= num_batches:
-        #     break
+    for i, (images, labels) in enumerate(tqdm(train_loader)):
         images = images.to(device)
         labels = labels.to(device)
-        # print(images)
-        outputs = net(images)
+        
+        outputs, layer_times = net(images)
+        
+        # Print layer times
+        for i, layer_time in enumerate(layer_times):
+            print(f"Layer {i+1}: {layer_time:.4f} seconds")
+        
         loss = criterion(outputs, labels)
         running_loss += loss.item()
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-
-        # _, predicted = torch.max(outputs, 1)
-        # _, top3 = torch.topk(outputs, 3, dim=1)
-        # total += labels.size(0)
-        # correct_top1 += (predicted == labels).sum().item()
-        # correct_top3 += sum([labels[i] in top3[i] for i in range(labels.size(0))])
-
-        # top1_accuracy = 100 * correct_top1 / total
-        # top3_accuracy = 100 * correct_top3 / total
-        # progress_bar.set_postfix(loss=running_loss/(i+1), top1_acc=top1_accuracy, top3_acc=top3_accuracy)
-
-        # batch_count += 1
         break
-#     epoch_loss = running_loss / len(train_loader)
-#     epoch_top1_accuracy = 100 * correct_top1 / total
-#     epoch_top3_accuracy = 100 * correct_top3 / total
-#     print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {epoch_loss:.4f}, Top-1 Accuracy: {epoch_top1_accuracy:.2f}%, Top-3 Accuracy: {epoch_top3_accuracy:.2f}%')
-    print(time.time()-start_time)
-            
-# net.eval()
-
-# Disable gradient calculation
-# with torch.no_grad():
-#     correct_top1 = 0
-#     correct_top3 = 0
-#     total = 0
-
-#     for images, labels in test_loader:
-#         images = images.to(device)
-#         labels = labels.to(device)
-
-#         # Forward pass
-#         outputs = net(images)
-
-#         # Top-1 accuracy
-#         _, predicted = torch.max(outputs, 1)
-#         total += labels.size(0)
-#         correct_top1 += (predicted == labels).sum().item()
-
-#         # Top-3 accuracy
-#         _, top3 = torch.topk(outputs, 3, dim=1)
-#         correct_top3 += sum([labels[i] in top3[i] for i in range(labels.size(0))])
-
-#     top1_accuracy = 100 * correct_top1 / total
-#     top3_accuracy = 100 * correct_top3 / total
-
-#     print(f'Top-1 Accuracy: {top1_accuracy:.2f}%')
-#     print(f'Top-3 Accuracy: {top3_accuracy:.2f}%')
-# print("--- %s seconds ---" % (time.time() - start_time))
+        
+    print(time.time() - start_time)
