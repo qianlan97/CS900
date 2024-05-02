@@ -61,41 +61,6 @@ test_loader = torch.utils.data.DataLoader(dataset = test_dataset,
                                           batch_size = batch_size,
                                           shuffle = False)
 
-# def write_data_to_mmap(file_path, data_tuple):
-#     global send_to_server_time
-#     tempstart = time.time()
-#     with open(file_path, "wb") as f:
-#         # Serialize shape information
-#         x, *other_params = data_tuple
-#         shape = x.shape
-#         f.write(struct.pack('I', len(shape)))
-#         for dim in shape:
-#             f.write(struct.pack('I', dim))
-#         # Write tensor data
-#         f.write(x.detach().numpy().tobytes())
-#         # Write other parameters
-#         for param in other_params:
-#             f.write(struct.pack('f', param))
-#     send_to_server_time += time.time() - tempstart
-
-# def read_tensor_from_mmap(file_path):
-#     global read_from_server_time
-#     tempstart = time.time()
-#     with open(file_path, "r+b") as f:
-#         mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
-#         # Read the number of dimensions
-#         num_dims = struct.unpack('I', mm.read(4))[0]
-#         # Read each dimension size
-#         shape = []
-#         for _ in range(num_dims):
-#             shape.append(struct.unpack('I', mm.read(4))[0])
-#         shape = tuple(shape)
-#         writable_data = np.frombuffer(mm.read(), dtype=np.float32).copy()
-#         tensor = torch.from_numpy(writable_data).view(shape)
-#         # tensor = torch.frombuffer(mm.read(), dtype=torch.float32).view(shape)
-#         mm.close()
-#     read_from_server_time += time.time() - tempstart
-#     return tensor
 def write_data_to_mmap(file_path, data_tuple):
     global send_to_server_time
     tempstart = time.time()
@@ -165,82 +130,6 @@ def wait_for_server_response(status_path):
                 if f.read() == 'processed':
                     break
         time.sleep(0.0001)
-
-# class CustomConv2d(nn.Module):
-#     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, bias=False):
-#         super(CustomConv2d, self).__init__()
-#         self.in_channels = in_channels
-#         self.out_channels = out_channels
-#         self.kernel_size = kernel_size
-#         self.stride = stride
-#         self.padding = padding
-#         self.bias = bias
-
-#     def forward(self, x):
-#         # x = x+x-x+x-x
-#         data_tuple = (x, self.in_channels, self.out_channels, self.kernel_size, self.stride, self.padding, self.bias)
-#         write_data_to_mmap(file_path_1, data_tuple)
-#         signal_server_ready_conv(status_path)
-#         print("Tensor written to shared memory. Waiting for the server to process it.")
-#         wait_for_server_response(status_path)
-#         new_x = read_tensor_from_mmap(file_path_2).to(device)
-#         os.remove(file_path_2)
-#         new_x.requires_grad_()
-#         print("New tensor received from the server:")
-#         print("Conv2d layer: --- %s ---" % (time.time() - start_time))
-#         return new_x
-#         # return new_x+new_x
-
-
-# class CustomLinear(nn.Module):
-#     def __init__(self, in_features, out_features, bias=True):
-#         super(CustomLinear, self).__init__()
-#         self.in_features = in_features
-#         self.out_features = out_features
-#         self.bias = bias
-
-#     def forward(self, x):
-#         # x = x+x-x+x-x
-#         data_tuple = (x, self.in_features, self.out_features, self.bias)
-#         write_data_to_mmap(file_path_1, data_tuple)
-#         signal_server_ready_linear(status_path)
-#         print("Tensor written to shared memory. Waiting for the server to process it.")
-#         wait_for_server_response(status_path)
-#         new_x = read_tensor_from_mmap(file_path_2).to(device)
-#         os.remove(file_path_2)
-#         new_x.requires_grad_()
-#         print("New tensor received from the server:")
-#         print("Linear layer: --- %s ---" % (time.time() - start_time))
-#         return new_x
-#         # return new_x+new_x
-
-# class CustomBatchNorm2d(nn.BatchNorm2d):
-#     def forward(self, x):
-#         global bn_time
-#         tempstart = time.time()
-#         # normalized_x = super(CustomBatchNorm2d, self).forward(x)
-#         normalized_x = x
-#         bn_time += time.time() - tempstart
-#         return normalized_x
-
-# class CustomReLU(nn.ReLU):
-#     def forward(self, x):
-#         global relu_time
-#         tempstart = time.time()
-#         activated_x = super(CustomReLU, self).forward(x)
-#         # print("relu layer: --- %s ---" % (datetime.now()))
-#         relu_time += time.time() - tempstart
-#         return activated_x
-
-# class CustomMaxPool2d(nn.MaxPool2d):
-#     def forward(self, x):
-#         global pool_time
-#         tempstart = time.time()
-#         pooled_x = super(CustomMaxPool2d, self).forward(x)
-#         # print("max pool layer: --- %s ---" % (datetime.now()))
-#         pool_time += time.time() - tempstart
-#         return pooled_x
-        
 
 class CustomConv2d(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, bias=False, layer_id=None):
@@ -480,7 +369,7 @@ for epoch in range(num_epoches):
     batch_count = 0
     for i, (images, labels) in enumerate(train_loader):
         if batch_count >= num_batches:
-            break  # Stop the loop after processing num_batches batches
+            break
         images = images.to(device)
         labels = labels.to(device)
         optimizer.zero_grad()
