@@ -45,18 +45,9 @@ sgx.trusted_files = [
   "file:{{ path }}{{ '/' if path.is_dir() else '' }}",
 {% endfor %}
 
-#  "file:client_resnet18.py",
   "file:client_vgg19.py",
-#  "file:client_alexnet.py",
-#  "file:tee_resnet18.py",
+  "file:sdc_vgg19.py",
   "file:tee_vgg19.py",
-#  "file:tee_alexnet.py",
-#  "file:encryp_time.py",
-#  "file:test1.py",
-#  "file:test2.py",
-#  "file:benchmark.py",
-
-#  "file:single-image/cifar10_test_image.png",
   "file:dataset/",
 ]
 
@@ -64,5 +55,4 @@ sgx.allowed_files = [
   "file:shared_mmap_1.dat",
   "file:shared_mmap_2.dat",
   "file:status.dat",
-#  "file:gradients.pt",
 ]

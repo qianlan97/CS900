@@ -123,6 +123,10 @@ def signal_server_ready_maxpool(status_path):
     with open(status_path, 'w') as f:
         f.write('ready_maxpool')
 
+def signal_server_ready_dropout(status_path):
+    with open(status_path, 'w') as f:
+        f.write('ready_dropout')
+
 def wait_for_server_response(status_path):
     while True:
         if os.path.exists(status_path):
@@ -272,6 +276,25 @@ class CustomLinear(nn.Module):
         print("Layer",self.layer_id, "(linear) is done")
         return new_x
 
+class CustomDropout(nn.Module):
+    def __init__(self, p=0.5, layer_id=None):
+        super(CustomDropout, self).__init__()
+        self.p = p
+        self.layer_id = layer_id
+
+    def forward(self, x):
+        start_time = time.time()
+        data_tuple = (x, self.p)
+        write_data_to_mmap(file_path_1, data_tuple)
+        signal_server_ready_dropout(status_path)
+        wait_for_server_response(status_path)
+        new_x = read_tensor_from_mmap(file_path_2).to(device)
+        os.remove(file_path_2)
+        new_x.requires_grad_()
+        layer_times[self.layer_id] = time.time() - start_time
+        print("Layer",self.layer_id, "(dropout) is done")
+        return new_x
+
 
 class VGG19(nn.Module):
     def __init__(self, in_dim, num_classes):
@@ -339,12 +362,12 @@ class VGG19(nn.Module):
         self.classifier = nn.Sequential(
             CustomLinear(512 * 7 * 7, 4096, layer_id='Layer 54'),
             CustomReLU(layer_id='Layer 55'),
-            nn.Dropout(0.5),
+            CustomDropout(0.5, layer_id='Layer 56'),
             CustomLinear(4096, 4096, layer_id='Layer 57'),
             CustomReLU(layer_id='Layer 58'),
-            nn.Dropout(0.5),
+            CustomDropout(0.5, layer_id='Layer 59'),
             CustomLinear(4096, num_classes, layer_id='Layer 60')
-        )
+)
     def forward(self, x):
         x = self.features(x)
         x = x.view(x.size(0),-1)

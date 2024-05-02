@@ -55,6 +55,8 @@ def read_parameter_from_mmap(mm):
         writable_data = np.frombuffer(mm.read(torch.prod(torch.tensor(shape)) * 4), dtype=np.float32).copy()
         tensor = torch.from_numpy(writable_data).view(shape)
         return tensor
+    elif param_type == 4:
+        return struct.unpack('f', mm.read(4))[0]
     else:
         raise ValueError(f"Unsupported parameter type: {param_type}")
 
@@ -162,6 +164,17 @@ def read_linear_from_mmap(file_path):
     read_from_client_time += time.time() - tempstart
     return x, weight, bias
 
+def read_dropout_from_mmap(file_path):
+    global read_from_client_time
+    tempstart = time.time()
+    with open(file_path, "rb") as f:
+        mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
+        x = read_parameter_from_mmap(mm)
+        p = read_parameter_from_mmap(mm)
+        mm.close()
+    read_from_client_time += time.time() - tempstart
+    return x, p
+
 def write_tensor_to_mmap(file_path, tensor):
     global send_to_client_time
     tempstart = time.time()
@@ -192,6 +205,8 @@ def wait_for_client_data(status_path):
                     return 4
                 elif temp == 'ready_maxpool':
                     return 5
+                elif temp == 'ready_dropout':
+                    return 6
         time.sleep(0.0001)
 
 def signal_client_processed(status_path):
@@ -337,4 +352,27 @@ while True:
             read_from_client_time = 0
             send_to_client_time = 0
             computation_time = 0
+        time.sleep(0.0001)
+    elif optype == 6:
+        x, p = read_dropout_from_mmap(file_path_1)
+        print("Dropout data received from shared memory:")
+        os.remove(file_path_1)
+
+        if x is None:
+            print("Received None data for Dropout layer. Skipping computation.")
+            signal_client_processed(status_path)
+            continue
+
+        tempstart = time.time()
+        x = x.to(device)
+        x = F.dropout(x, p, training=True).cpu()
+
+        print("Dropout layer time: --- %s seconds ---" % (time.time() - tempstart))
+        computation_time += time.time() - tempstart
+
+        write_tensor_to_mmap(file_path_2, x)
+        signal_client_processed(status_path)
+        print("Processed tensor written back to shared memory.")
+        print("count:", count)
+        count += 1
         time.sleep(0.0001)
