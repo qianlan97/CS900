@@ -1,7 +1,21 @@
 # Gramine-SGX
 
 ## This program runs on `Gramine` which is a layer OS on top of Intel's SGX.
-[See Gramine document](https://gramine.readthedocs.io/en/stable/index.html)
+
+Tutorials about installing SGX dependency is listed in [Most up to date installation guide (2/28/2023 version)](https://download.01.org/intel-sgx/latest/linux-latest/docs/Intel_SGX_SW_Installation_Guide_for_Linux.pdf)
+- In depth installation guide, useful for information about required drivers, the github below is easier to follow for PSW and SDK installation
+- In case of bios with "software-enabled" option in bios and driver not found in dev folder use https://github.com/intel/sgx-software-enable
+
+[Linux sgx github with ReadMe for installing Intel SGX PSW and Intel SGX PSW](https://github.com/intel/linux-sgx)
+
+[Installation of Intel sgx sdk on linux 20.04 walkthrough](https://www.youtube.com/watch?v=X0YzzT4uAY4)
+- This video does not cover psw installation, refer to github for that, useful for visual represenation
+
+For hardware requirements, you have to use an Intel CPU which probabaly before 10th generation(for example, 9700k), but you can look it up in each CPU's specification to check whether they support Intel SGX or not. Type your cpu name into search bar [Check for valid intel cpu](https://ark.intel.com/content/www/us/en/ark/products/186604/intel-core-i79700k-processor-12m-cache-up-to-4-90-ghz.html)
+
+Also, you must use a Linux OS that is not installed on a Mac machine. Since Mac doesn't allow you to enter bios, you can't enable SGX features.
+
+Everything about installing the Gramine/ tuning software environment is listed in [See Gramine document](https://gramine.readthedocs.io/en/stable/index.html).
 
 # Important
 
@@ -49,6 +63,8 @@ First make sure that you have SGX environment installed on your device with the 
 Then run `make` to build the non-SGX version and `make SGX=1` to build the SGX
 version.
 
+Use `make clean` to clean files after the run.
+
 # Run
 
 Execute any one of the following commands to run the workload:
@@ -59,8 +75,8 @@ Execute any one of the following commands to run the workload:
 
 Here the `./pytorch` doesn't mean folder directory, but the project name is `pytorch`. To modify it, change the `manifest.template` file name along with those file names in `Makefile`.
 
-- For `sdc_vgg19.py`, just run it inside SGX/gramine.
+Example: `gramine-sgx ./pytorch ./client_vgg19.py`
 
 - For recording total extra time experiment, we need to first run `server.py` using plain python, then we can run `client_vgg19.py` inside SGX/gramine.
 
-- For other python programs, just run it with plain python.
+- For all other python programs, just run it with plain python.
